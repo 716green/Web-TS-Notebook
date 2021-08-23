@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import * as esbuild from 'esbuild-wasm';
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
 import { fetchPlugin } from './plugins/fetch-plugin';
+import CodeEditor from './components/code-editor';
 
 const App = () => {
   const ref = useRef<any>();
+  const iframe = useRef<any>();
   const [input, setInput] = useState<string>('');
-  const [code, setCode] = useState<string>('');
 
   const startService = async () => {
     ref.current = await esbuild.startService({
@@ -25,38 +26,59 @@ const App = () => {
       return;
     }
 
+    iframe.current.srcdoc = html;
+
     const result = await ref.current.build({
       entryPoints: ['index.js'],
       bundle: true,
       write: false,
       plugins: [unpkgPathPlugin(), fetchPlugin(input)],
-      // Replace X:Y
       define: {
         'process.env.NODE_ENV': '"production"',
         global: 'window',
       },
     });
 
-    const { outputFiles } = result;
-    setCode(outputFiles[0].text);
-
-    try {
-      // eslint-disable-next-line no-eval
-      eval(outputFiles[0].text);
-    } catch (err) {
-      alert(err);
-    }
+    iframe.current.contentWindow.postMessage(result.outputFiles[0].text, '*');
   };
+
+  const html = /*html*/ `
+  <html lang="en">
+  <head>
+    <title>IFrame</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+    window.addEventListener('message', (event) => {
+      try {
+        eval(event.data)
+      } catch (err) {
+        const root = document.querySelector('#root')
+        root.innerHTML = '<div style="background-color: #fff0f1;color: #ff3f39;">' + err + '</div>'
+        console.error(err)
+      }
+    }, false)
+    </script>
+    
+  </body>
+  </html>
+
+  `;
 
   return (
     <div>
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}></textarea>
+      <CodeEditor initialValue={input} onChange={(value) => setInput(value)} />
+      <textarea value={input} onChange={(e) => setInput(e.target.value)} />
       <div>
         <button onClick={onClickHandler}>Submit</button>
       </div>
-      <pre>{code}</pre>
+      <iframe
+        ref={iframe}
+        title="preview"
+        sandbox="allow-scripts"
+        srcDoc={html}
+      />
     </div>
   );
 };
