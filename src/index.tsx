@@ -4,10 +4,14 @@ import * as esbuild from 'esbuild-wasm';
 import { unpkgPathPlugin } from './plugins/unpkg-path-plugin';
 import { fetchPlugin } from './plugins/fetch-plugin';
 import CodeEditor from './components/code-editor';
+import Preview from './components/preview';
+
+import 'bulmaswatch/superhero/bulmaswatch.min.css';
 
 const App = () => {
   const ref = useRef<any>();
-  const iframe = useRef<any>();
+
+  const [code, setCode] = useState<string>('');
   const [input, setInput] = useState<string>('');
 
   const startService = async () => {
@@ -26,8 +30,6 @@ const App = () => {
       return;
     }
 
-    iframe.current.srcdoc = html;
-
     const result = await ref.current.build({
       entryPoints: ['index.js'],
       bundle: true,
@@ -39,46 +41,16 @@ const App = () => {
       },
     });
 
-    iframe.current.contentWindow.postMessage(result.outputFiles[0].text, '*');
+    setCode(result.outputFiles[0].text);
   };
-
-  const html = /*html*/ `
-  <html lang="en">
-  <head>
-    <title>IFrame</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script>
-    window.addEventListener('message', (event) => {
-      try {
-        eval(event.data)
-      } catch (err) {
-        const root = document.querySelector('#root')
-        root.innerHTML = '<div style="background-color: #fff0f1;color: #ff3f39;">' + err + '</div>'
-        console.error(err)
-      }
-    }, false)
-    </script>
-    
-  </body>
-  </html>
-
-  `;
 
   return (
     <div>
       <CodeEditor initialValue={input} onChange={(value) => setInput(value)} />
-      <textarea value={input} onChange={(e) => setInput(e.target.value)} />
       <div>
         <button onClick={onClickHandler}>Submit</button>
       </div>
-      <iframe
-        ref={iframe}
-        title="preview"
-        sandbox="allow-scripts"
-        srcDoc={html}
-      />
+      <Preview code={code} />
     </div>
   );
 };
