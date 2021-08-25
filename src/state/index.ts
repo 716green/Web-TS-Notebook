@@ -1,2 +1,2 @@
-console.log('store root index');
-export default null;
+export * from './store';
+export * from './reducers';
