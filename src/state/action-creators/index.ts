@@ -1,6 +1,6 @@
 import { ActionType } from '../action-types';
 import {
-  Action,
+  // Action,
   UpdateCellAction,
   DeleteCellAction,
   MoveCellAction,
@@ -13,7 +13,7 @@ export const updateCell = (id: string, content: string): UpdateCellAction => {
   return {
     type: ActionType.UPDATE_CELL,
     payload: {
-      id: '',
+      id,
       content,
     },
   };

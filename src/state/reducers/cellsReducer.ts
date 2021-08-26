@@ -21,15 +21,17 @@ const initialState: CellsState = {
 
 // Using Immer to mutate state with produce()
 const reducer = produce(
-  (state: CellsState = initialState, action: Action): CellsState | void => {
+  (state: CellsState = initialState, action: Action): CellsState => {
     switch (action.type) {
       case ActionType.UPDATE_CELL:
         const { id, content } = action.payload;
         state.data[id].content = content;
+
         return state;
       case ActionType.DELETE_CELL:
         delete state.data[action.payload];
         state.order = state.order.filter((id) => id !== action.payload);
+
         return state;
       case ActionType.MOVE_CELL:
         const { direction } = action.payload;
@@ -46,16 +48,16 @@ const reducer = produce(
         return state;
       case ActionType.INSERT_CELL_BEFORE:
         const cell: Cell = {
-          content: '',
-          type: action.payload.type,
           id: randomId(),
+          type: action.payload.type,
+          content: '',
         };
 
         state.data[cell.id] = cell;
 
-        const foundIndex = state.order.findIndex((id) => {
-          return id === action.payload.id;
-        });
+        const foundIndex = state.order.findIndex(
+          (id) => id === action.payload.id
+        );
 
         if (foundIndex < 0) {
           state.order.push(cell.id);
@@ -67,7 +69,8 @@ const reducer = produce(
       default:
         return state;
     }
-  }
+  },
+  initialState
 );
 
 const randomId = () => Math.random().toString(36).substr(2, 5);

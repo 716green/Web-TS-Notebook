@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-// import bundle from '../bundler';
 import './preview.css';
 
 interface PreviewProps {
@@ -49,10 +48,11 @@ const Preview: React.FC<PreviewProps> = ({ code, bundleError }) => {
 
   useEffect(() => {
     iframe.current.srcdoc = html;
-    setTimeout(() => {
-      iframe.current.contentWindow.postMessage(code, '*');
-    }, 50);
   }, [code]);
+
+  const loadHandler = () => {
+    iframe.current.contentWindow.postMessage(code, '*');
+  };
 
   return (
     <div className="preview-wrapper">
@@ -61,6 +61,7 @@ const Preview: React.FC<PreviewProps> = ({ code, bundleError }) => {
         title="preview"
         sandbox="allow-scripts"
         srcDoc={html}
+        onLoad={loadHandler}
       />
       {bundleError && <div className="preview-error">{bundleError}</div>}
     </div>
