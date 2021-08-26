@@ -2,6 +2,8 @@
 
 > A TypeScript-based documentation notebook and Web-IDE
 
+You can reference variables from between blocks within a notebook
+
 ---
 
 # Todo
