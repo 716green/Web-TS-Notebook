@@ -6,33 +6,30 @@
 
 # Todo
 
+- Look into adding HTML into the Markdown (Try it, it does strange things)
 - Add the following code as either a default, or a 'quick add' option:
   ```jsx
   import React from 'react';
   import ReactDOM from 'react-dom';
   import 'bulma/css/bulma.css';
+  const Code = () => {
+    return <div>Hello World</div>;
+  };
+  ReactDOM.render(<Code />, document.querySelector('#root'));
   ```
-
-const App = () => {
-return <div>Hello World</div>;
-};
-
-ReactDOM.render(<App />, document.querySelector('#root'));
-
-```
 
 # Redux
 
 ## Action Creators
 
-|                          |
-| ------------------------ |
-| `updateCell`             |
-| `deleteCell`             |
-| `insertCellBefore/After` |
-| `moveCell`               |
-| `fetchCells`             |
-| `Bundles`                |
+|                   |
+| ----------------- |
+| `updateCell`      |
+| `deleteCell`      |
+| `insertCellAfter` |
+| `moveCell`        |
+| `fetchCells`      |
+| `Bundles`         |
 
 ---
 
@@ -46,4 +43,7 @@ ReactDOM.render(<App />, document.querySelector('#root'));
 |         | ->  | order   | `string[]`            | Order of cells             |
 |         |     |         |                       |                            |
 | Bundles | ->  | data    | `{[cell Id]: Bundle}` | Bundle for each cell       |
+
+```
+
 ```
